@@ -1,5 +1,6 @@
 // import 'package:DE/main.dart';
 import 'package:demoproject/home.dart';
+import 'package:demoproject/ip.dart';
 import 'package:demoproject/main.dart';
 import 'package:demoproject/userdash.dart';
 
@@ -31,7 +32,8 @@ class _SigninState extends State<Signin> {
 Future<void> _login() async {
   print('sigin clicked');
   final response = await http.post(
-    Uri.parse('http://10.0.2.2:8000/api/userlogin/'),
+    // Uri.parse('http://10.0.2.2:8000/api/userlogin/'),
+     Uri.parse(ip+'api/userlogin/'),
     headers: {'Content-Type': 'application/json'},
     body: json.encode({
       'email': _email.text,

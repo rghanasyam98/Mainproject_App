@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:demoproject/bottomnav.dart';
 import 'package:demoproject/drawer.dart';
 import 'package:demoproject/homeelements.dart';
+import 'package:demoproject/ip.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/src/widgets/container.dart';
@@ -32,7 +33,9 @@ class _NewsState extends State<News> {
   
 getnews() async{
    final token = await storage.read(key: 'token');
-   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getnews/'));
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getnews/'));
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/getnews/'));
+
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -108,7 +111,7 @@ body:  Column(
                           topRight: Radius.circular(10),
                         ),
                         child: Image.network(
-                          'http://192.168.43.210:8000/media/${item['image']}',
+                          ip+'media/${item['image']}',
                           width: double.infinity,
                           // height: 200,
                           fit: BoxFit.cover,

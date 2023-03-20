@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:demoproject/home.dart';
+import 'package:demoproject/ip.dart';
 import 'package:demoproject/userdash.dart';
 import 'package:http/http.dart' as http;
 
@@ -39,7 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
   print('sigin clicked');
   final response = await http.post( 
     // Uri.parse('http://10.0.2.2:8000/api/userlogin/'),
-     Uri.parse('http://192.168.43.210:8000/api/userlogin/'),
+    //  Uri.parse('http://192.168.43.210:8000/api/userlogin/'),
+         Uri.parse(ip+'api/userlogin/'),
+
     headers: {'Content-Type': 'application/json'},
     body: json.encode({
       'email': emailController.text,

@@ -1,6 +1,6 @@
 
 import 'dart:convert';
-
+import 'package:demoproject/ip.dart';
 import 'package:demoproject/accountrequest.dart';
 import 'package:demoproject/afteraccountadd.dart';
 import 'package:demoproject/bottomnav.dart';
@@ -45,7 +45,9 @@ class _AccountlinkState extends State<Accountlink> {
 
   addaccount() async{
      final token = await storage.read(key: 'token');
-    var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/accountadd/$acc_reqid/'));
+    // var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/accountadd/$acc_reqid/'));
+
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/accountadd/$acc_reqid/'));
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -83,16 +85,18 @@ class _AccountlinkState extends State<Accountlink> {
     
   accountlink() async{
     
-         if(_accno.text.toString() == null || _accno.text.toString().isEmpty ){
+        //  if(_accno.text.toString() == null || _accno.text.toString().isEmpty ){
+           if(!RegExp(r'^[0-9]+$').hasMatch(_accno.text.trim()) || _accno.text.toString().isEmpty ){
       ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter account number...')),
+                  const SnackBar(content: Text('Enter valid account number...')),
                 
                 );
                 return;
     }
     final token = await storage.read(key: 'token');
     print(token);
-  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/accountlink/'));
+  // var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/accountlink/'));
+  var request = http.MultipartRequest('POST', Uri.parse(ip+'api/accountlink/'));
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -135,12 +139,21 @@ setState(() {
        ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Invalid account number....')),
     );
+    
+    
     //  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
     // UserHome()), (Route<dynamic> route) => false);
     }
     else if(response.statusCode==403){
        ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Poor network connection....')),
+    );
+    //  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
+    // UserHome()), (Route<dynamic> route) => false);
+    }
+    else if(response.statusCode==401){
+       ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Requested account is already linked....')),
     );
     //  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
     // UserHome()), (Route<dynamic> route) => false);

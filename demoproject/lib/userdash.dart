@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:demoproject/bottomnav.dart';
 import 'package:demoproject/drawer.dart';
 import 'package:demoproject/homeelements.dart';
+import 'package:demoproject/ip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -32,7 +33,8 @@ class _UserHomeState extends State<UserHome> {
   }
 getinfoforinitialize() async{
    final token = await storage.read(key: 'token');
-   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getinfoforinitialize/'));
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getinfoforinitialize/'));
+   var request = http.MultipartRequest('POST', Uri.parse(ip+'api/getinfoforinitialize/'));
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -45,17 +47,31 @@ getinfoforinitialize() async{
        final data = json.decode(body);
       //  print(data['accholdername'].toString());
       //   print(data['acctype'].toString());
+      print(data);
          await storage.write(key: 'accno', value: data['accno'].toString());  
          await storage.write(key: 'accholdername', value: data['accholdername'].toString());
           await storage.write(key: 'acctype', value: data['acctype'].toString());
-         String? accno = await storage.read(key: 'accno');
-          String? accholdername = await storage.read(key: 'accholdername');
-           String? acctype = await storage.read(key: 'acctype');
-        //  print(""+accno.toString()+accholdername.toString()+acctype.toString()); 
+           await storage.write(key: 'mail', value: data['mail'].toString());
+            await storage.write(key: 'phone', value: data['phone'].toString());
+        //  String? accno = await storage.read(key: 'accno');
+        //   String? accholdername = await storage.read(key: 'accholdername');
+        //    String? acctype = await storage.read(key: 'acctype');
+        // //  print(""+accno.toString()+accholdername.toString()+acctype.toString()); 
         //  print(""+accno.toString());
         //   print(""+accholdername.toString());
         //             print(""+acctype.toString());
 
+    }
+    else if(response.statusCode == 400){
+       await storage.write(key: 'accno', value: null);  
+       final body = await response.stream.bytesToString();
+       final data = json.decode(body);
+            await storage.write(key: 'mail', value: data['mail'].toString());
+            await storage.write(key: 'phone', value: data['phone'].toString());
+          //    String? mmail = await storage.read(key: 'mail');
+          // String? pphone = await storage.read(key: 'phone');
+          //   print(mmail);
+          //    print(pphone);
     }
     else{
       await storage.write(key: 'accno', value: null);  

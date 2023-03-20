@@ -1,6 +1,7 @@
 import 'package:demoproject/Login_Screen.dart';
 import 'package:demoproject/bottomnav.dart';
 import 'package:demoproject/drawer.dart';
+import 'package:demoproject/ip.dart';
 import 'package:demoproject/viewloans.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -51,7 +52,9 @@ if(accNum != null){
       final token = await storage.read(key: 'token');
 
   print("hai");
-   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getappliedloan/'));
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getappliedloan/'));
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/getappliedloan/'));
+
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -91,11 +94,11 @@ if(accNum != null){
 
       else{
 
-         ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Please link your account with app before applying for loan....')),
-    );
-         Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
-    Loantab()), (Route<dynamic> route) => false);
+    //      ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text('Please link your account with app before applying for loan....')),
+    // );
+    //      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
+    // Loantab()), (Route<dynamic> route) => false);
       }
 
 }
@@ -104,7 +107,9 @@ if(accNum != null){
 
   getloaninfo() async{
     final token = await storage.read(key: 'token');
-   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getloans/'));
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getloans/'));
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/getloans/'));
+
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -142,7 +147,9 @@ final storage = FlutterSecureStorage();
   print('logot clicked');
   var response = await http.post(
     // Uri.parse('http://10.0.2.2:8000/api/userlogout/'), 
-    Uri.parse('http://192.168.43.210:8000/api/userlogout/'),  
+    // Uri.parse('http://192.168.43.210:8000/api/userlogout/'),  
+        Uri.parse(ip+'api/userlogout/'),  
+
     headers: {
       'Authorization': '$token',
     },
@@ -175,7 +182,9 @@ if(accNum != null){
   final amount=_amountcontroller.text.toString();
   print("hai");
   final token = await storage.read(key: 'token');
-   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/loanrequest/'));
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/loanrequest/'));
+      var request = http.MultipartRequest('POST', Uri.parse(ip+'api/loanrequest/'));
+
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -191,13 +200,24 @@ if(accNum != null){
        final body = await response.stream.bytesToString();
        final data = json.decode(body);
        print(data);
+         
+          ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Request for loan successfully send')),
+      );
+       Navigator.pop(context);
+    
+//        Navigator.pushReplacement(
+//   context,
+//   MaterialPageRoute(builder: (context) => Loantab()),
+// );
        Navigator.push(context, MaterialPageRoute(builder: (context) => Loantab()));
       // setState(() {
       //    myList = data;
       // });
-        ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Request for loan successfully send')),
-      );
+     
+      
+      // return;
+        // Navigator.pop(context);
 
     }
     else if(response.statusCode == 204) {
@@ -262,6 +282,8 @@ if(accNum != null){
            ElevatedButton.icon(onPressed: (() {
              if (_formKey.currentState!.validate()){
                 sendloanrequest();
+                //  Navigator.pop(context);
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => Loantab()));
              }
           
            }), icon: Icon(Icons.send_rounded), 

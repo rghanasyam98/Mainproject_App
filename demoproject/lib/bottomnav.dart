@@ -34,7 +34,7 @@ class _Screen1State extends State<Screen1> {
     UserHome()), (Route<dynamic> route) => false);
       
       }
-      else{
+      else if(_selectedIndex == 1){
 
   //       final token = await storage.read(key: 'token');
   //   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/editprofilecheck/'));
@@ -78,7 +78,11 @@ if(accNum != null){
     );
          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
     UserHome()), (Route<dynamic> route) => false);
-      }
+      
+ }
+ }
+ else{
+
  }
  }
   @override
@@ -101,7 +105,7 @@ if(accNum != null){
         BottomNavigationBarItem(
           icon: Icon(Icons.person),label: 'Profile'),
           
-        // BottomNavigationBarItem(icon:  Icon(Icons.search),label: 'Search')
+        BottomNavigationBarItem(icon:  Icon(Icons.search),label: 'Search')
       ]);
   
 }}

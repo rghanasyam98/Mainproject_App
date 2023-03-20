@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:demoproject/Login_Screen.dart';
 import 'package:demoproject/bottomnav.dart';
+import 'package:demoproject/ip.dart';
 import 'package:demoproject/userdash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -87,7 +88,7 @@ class _EditprofileState extends State<Editprofile> {
                 
                 );
     }
-     else if(_income.text.toString() == null || _income.text.toString().isEmpty){
+     else if(!RegExp(r'^[0-9]+$').hasMatch(_income.text.trim())){
            ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Enter income...')),
                 
@@ -118,7 +119,9 @@ class _EditprofileState extends State<Editprofile> {
     // }
     else{
      final accNum= await storage.read(key: 'accno');
-   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/updateprofile/'));
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/updateprofile/'));
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/updateprofile/'));
+
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -296,7 +299,9 @@ Future.delayed(Duration(seconds: 5), () {
 getinformation() async{
   final token = await storage.read(key: 'token');
   final accno = await storage.read(key: 'accno');
-  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getprofile/'));
+  // var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getprofile/'));
+    var request = http.MultipartRequest('POST', Uri.parse(ip+'api/getprofile/'));
+
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',
@@ -455,7 +460,7 @@ getinformation() async{
             CircleAvatar(
   radius: 50,
   backgroundColor: Colors.grey[200], // set the background color to a light grey
-  backgroundImage: NetworkImage('http://192.168.43.210:8000/media/${imgurl}'),
+  backgroundImage: NetworkImage(ip+'media/${imgurl}'),
   foregroundColor: Colors.white, // set the text and icon color to white
   child: Icon(Icons.person, size: 50), // add an icon in the center of the avatar
 ),

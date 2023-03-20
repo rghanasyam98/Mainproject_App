@@ -1,3 +1,4 @@
+import 'package:demoproject/ip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -50,7 +51,8 @@ class _HomeState extends State<Home> {
 }
 
 Future<void> userlogout() async {
-  final url = Uri.parse('http://10.0.2.2:8000/api/userlogout/');
+  // final url = Uri.parse('http://10.0.2.2:8000/api/userlogout/');
+  final url = Uri.parse(ip+'api/userlogout/');
   final token = await storage.read(key: 'token');
  
   final response = await http.post(

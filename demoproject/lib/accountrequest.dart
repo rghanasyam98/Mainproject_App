@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:demoproject/Login_Screen.dart';
 import 'package:demoproject/bottomnav.dart';
+import 'package:demoproject/ip.dart';
 import 'package:demoproject/userdash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -49,15 +50,15 @@ class _AccountrequestState extends State<Accountrequest> {
       print(token);
 
     print(_selectedDate);
-    if(_fname.text.toString() == null || _fname.text.toString().isEmpty ){
+    if(_fname.text.trim().isEmpty || !RegExp(r'^[a-zA-Z ]+$').hasMatch(_fname.text.trim()) ){
       ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter first name...')),
+                  const SnackBar(content: Text('Enter a valid first name...')),
                 
                 );
     }
-    else if(_lname.text.toString() == null || _lname.text.toString().isEmpty){
+    else if(_lname.text.trim().isEmpty || !RegExp(r'^[a-zA-Z ]+$').hasMatch(_lname.text.trim())){
              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter last name...')),
+                  const SnackBar(content: Text('Enter a valid last name...')),
                 
                 );
     }
@@ -79,9 +80,9 @@ class _AccountrequestState extends State<Accountrequest> {
                 
                 );
     }
-    else if(_nameoffms.text.toString() == null || _nameoffms.text.toString().isEmpty){
+    else if(_nameoffms.text.trim().isEmpty || !RegExp(r'^[a-zA-Z ]+$').hasMatch(_nameoffms.text.trim())){
            ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter name of father/mother/spouse...')),
+                  const SnackBar(content: Text('Enter valid name of father/mother/spouse...')),
                 
                 );
     }
@@ -91,9 +92,9 @@ class _AccountrequestState extends State<Accountrequest> {
                 
                 );
     }
-     else if(_nationality.text.toString() == null || _nationality.text.toString().isEmpty){
+     else if(_nationality.text.trim().isEmpty || !RegExp(r'^[a-zA-Z ]+$').hasMatch(_nationality.text.trim())){
            ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter nationality...')),
+                  const SnackBar(content: Text('Enter valid nationality...')),
                 
                 );
     }
@@ -103,9 +104,10 @@ class _AccountrequestState extends State<Accountrequest> {
                 
                 );
     }
-     else if(_income.text.toString() == null || _income.text.toString().isEmpty){
+    //  else if(_income.text.toString() == null || _income.toString().isEmpty){
+       else if(!RegExp(r'^[0-9]+$').hasMatch(_income.text.trim())){
            ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter income...')),
+                  const SnackBar(content: Text('Enter valid income...')),
                 
                 );
     }
@@ -127,9 +129,9 @@ class _AccountrequestState extends State<Accountrequest> {
                 
                 );
     }
-     else if(_nomname.text.toString() == null || _nomname.text.toString().isEmpty){
+     else if(_nomname.text.trim().isEmpty || !RegExp(r'^[a-zA-Z ]+$').hasMatch(_nomname.text.trim())){
            ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter nominee name...')),
+                  const SnackBar(content: Text('Enter valid nominee name...')),
                 
                 );
     }
@@ -139,13 +141,13 @@ class _AccountrequestState extends State<Accountrequest> {
                 
                 );
     }
-     else if(_relation.text.toString() == null || _relation.text.toString().isEmpty){
+     else if(_relation.text.trim().isEmpty || !RegExp(r'^[a-zA-Z ]+$').hasMatch(_relation.text.trim())){
            ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter relation to nominee...')),
+                  const SnackBar(content: Text('Enter valid relation to nominee...')),
                 
                 );
     }
-     else if(_aadhar.text.toString() == null || _aadhar.text.toString().length !=12){
+     else if(_aadhar.text.toString() == null || !RegExp(r'^[0-9]{12}$').hasMatch(_aadhar.text.trim())){
            ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Enter valid aadhar...')),
                 
@@ -187,7 +189,8 @@ class _AccountrequestState extends State<Accountrequest> {
     // final headers = {'Content-Type': 'application/json', 'Authorization': '$token',};
     // final response = await http.post(url, body: body, headers: headers);
     //     // final response = await http.post(url, body: body,);
-   var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/accountrequest/'));
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/accountrequest/'));
+  var request = http.MultipartRequest('POST', Uri.parse(ip+'api/accountrequest/'));
    final Map<String, String> headers = {
     'Content-Type': 'multipart/form-data',
     'Authorization': '$token',

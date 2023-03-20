@@ -56,87 +56,109 @@ class _AfteraccountaddState extends State<Afteraccountadd> {
        acctype=acctype1;
    });
  }
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-         appBar: Homeelements(),
-      drawer:  Mydrawer(),
-       bottomNavigationBar: Screen1(),
-        backgroundColor: Colors.teal,
-        body:  SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // CircleAvatar(
-              //   radius: 50.0,
-              //   backgroundImage: AssetImage('images/Profile_Pic.png'),
-              // ),
-              Text(
-                'Cooperative Bank',
-                style: TextStyle(
-                  fontFamily: 'Pacifico',
-                  fontSize: 30.0,
-                  color: Colors.white,
-                ),
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    home: Scaffold(
+      appBar: Homeelements(),
+      drawer: Mydrawer(),
+      bottomNavigationBar: Screen1(),
+      body: Container(
+         decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.yellowAccent, Colors.green],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // CircleAvatar or other visual element
+            SizedBox(
+              height: 100,
+              width: 100,
+              // child: Image.asset('assets/images/banksplash2.png'),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Cooperative Bank',
+              style: TextStyle(
+                fontFamily: 'Pacifico',
+                fontSize: 30.0,
+                color: Colors.blueGrey,
               ),
-              Text(
-                'Thamarassery',
-                style: TextStyle(
-                  fontFamily: 'Source Sans Pro',
-                  fontSize: 20.0,
-                  letterSpacing: 2.5,
-                  color: Colors.teal[100],
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            Text(
+              'Thamarassery',
+              style: TextStyle(
+                fontFamily: 'Source Sans Pro',
+                fontSize: 20.0,
+                letterSpacing: 2.5,
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold,
               ),
-              SizedBox(
-                height: 20.0,
-                width: 250.0,
-                child: Divider(
-                  color: Colors.teal.shade100,
+            ),
+             Card(
+                color: Colors.white.withOpacity(0.8),
+                margin: EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 25.0,
                 ),
-              ),
-              Card(
-                color: Colors.white,
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
                 child: ListTile(
-                  // leading: Icon(
-                  //   Icons.account_circle_rounded,
-                  //   color: Colors.teal,
-                  // ),
+                  leading: Icon(
+                    Icons.account_circle_rounded,
+                    color: Colors.teal,
+                  ),
                   title: Text(
                     'Account Number: $accno \nAccount holder: $accholder \nAccount type: $acctype',
                     style: TextStyle(
                       color: Colors.teal.shade900,
                       fontFamily: 'Source Sans Pro',
                       fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              // Card(
-              //   color: Colors.white,
-              //   margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-              //   child: ListTile(
-              //     leading: Icon(
-              //       Icons.email,
-              //       color: Colors.teal,
-              //     ),
-              //     title: Text(
-              //       'puranjaypotnis1@gmail.com',
-              //       style: TextStyle(
-              //         color: Colors.teal.shade900,
-              //         fontFamily: 'Source Sans Pro',
-              //         fontSize: 20.0,
-              //       ),
-              //     ),
-              //   ),
-              // ),
-            ],
-          )
-          ),
+            // SizedBox(
+            //   height: 20.0,
+            //   width: 250.0,
+            //   child: Divider(
+            //     color: Colors.white,
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 330),
+            //   child: Card(
+            //     color: Colors.white.withOpacity(0.8),
+            //     margin: EdgeInsets.symmetric(
+            //       vertical: 10.0,
+            //       horizontal: 25.0,
+            //     ),
+            //     child: ListTile(
+            //       leading: Icon(
+            //         Icons.account_circle_rounded,
+            //         color: Colors.teal,
+            //       ),
+            //       title: Text(
+            //         'Account Number: $accno \nAccount holder: $accholder \nAccount type: $acctype',
+            //         style: TextStyle(
+            //           color: Colors.teal.shade900,
+            //           fontFamily: 'Source Sans Pro',
+            //           fontSize: 20.0,
+            //           fontWeight: FontWeight.bold,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Another card or visual element
+          ],
         ),
-      );
-  }
+      ),
+    ),
+  );
+}
+
 }
