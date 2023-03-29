@@ -88,9 +88,11 @@ if(accNum != null){
   @override
   Widget build(BuildContext context) {
     return  BottomNavigationBar(
+      // backgroundColor: Colors.orangeAccent,
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.green,
         currentIndex: _selectedIndex,
+        
         onTap: (value) {
          setState(() {
             _selectedIndex=value;

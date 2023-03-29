@@ -1,5 +1,6 @@
 import 'package:demoproject/accountlink.dart';
 import 'package:demoproject/afteraccountadd.dart';
+import 'package:demoproject/auction.dart';
 import 'package:demoproject/chit.dart';
 import 'package:demoproject/ip.dart';
 import 'package:demoproject/kyc.dart';
@@ -7,6 +8,7 @@ import 'package:demoproject/loan.dart';
 import 'package:demoproject/news.dart';
 import 'package:demoproject/progress.dart';
 import 'package:demoproject/userdash.dart';
+import 'package:demoproject/viewauction.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
@@ -165,6 +167,11 @@ if(accNum != null){
  }
 
 }
+
+getauctioninfo() async{
+   Navigator.push(context,
+      MaterialPageRoute(builder: (context) => Auctiontab()));
+}
   // @override
   @override
   Widget build(BuildContext context) {
@@ -215,7 +222,9 @@ if(accNum != null){
             ListTile(
               leading: Icon(Icons.gamepad_outlined,color: Colors.pinkAccent),
               title: Text("Auction",style: TextStyle(fontStyle: FontStyle.italic)),
-              onTap: () {},
+              onTap: () {
+                 getauctioninfo();
+              },
             ),
             ListTile(
               leading: Icon(Icons.document_scanner_rounded,color: Colors.deepPurple),
