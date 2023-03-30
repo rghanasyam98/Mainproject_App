@@ -3,39 +3,73 @@ import 'package:demoproject/ip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AuctionScreen extends StatefulWidget {
   final int auctionid;
   final int custchitid;
   final String auction_name;
   final String auction_amount;
+  final String auction_time;
   const AuctionScreen(
-      this.custchitid, this.auction_name, this.auction_amount, this.auctionid);
+      this.custchitid, this.auction_name, this.auction_amount, this.auctionid,this.auction_time);
   @override
   _AuctionScreenState createState() => _AuctionScreenState();
 }
 
 class _AuctionScreenState extends State<AuctionScreen> {
   Timer? _timer;
-  int _secondsRemaining = 120; // 0.5 hours = 1800 seconds
+  int? _secondsRemaining=1800 ; // 0.5 hours = 1800 seconds
   String _maxBidAmount = "";
   TextEditingController _amountController = TextEditingController();
   List<dynamic>? myList;
   // ValueNotifier<List<String>> bidAmountData = ValueNotifier([]);
   List<Bid> updatedBids = [];
   ValueNotifier<List<Bid>> bidAmountData = ValueNotifier([]);
+    double? auctionAmount;
+     double discountedAmount=0.0;
+     double minbidamount=0.0;
+     bool _thirdCall = false;
+          bool auction_over = false;
 
+  bool _secondCall = false;
+  bool _firstCall = false;
   @override
   void initState() {
-    print(widget.auction_name);
+    getsecondsremaining();
+print(widget.auction_name);
     print(widget.auction_amount);
     print(widget.custchitid);
     print(widget.auctionid);
-
+     auctionAmount = double.parse(widget.auction_amount);
+      discountedAmount = (auctionAmount! * 0.95);
+      minbidamount= (auctionAmount! * 0.70);
     super.initState();
+     
     myList = [];
     startTimer();
     startBidAmountUpdater();
+  }
+
+  getsecondsremaining() async{
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/get_auction_remaining_seconds/${widget.auctionid}/'));
+     final Map<String, String> headers = {
+    'Content-Type': 'multipart/form-data',
+  
+    };
+    request.headers.addAll(headers);
+    var response = await request.send();
+     
+    if (response.statusCode == 200) {
+      final responseJson = await response.stream.bytesToString();
+      final data = jsonDecode(responseJson);
+      print("^^^^^$data");
+      _secondsRemaining=data['remaining_seconds'].toInt();;
+        print("^^^^^$_secondsRemaining");
+    }
+    else{
+      _secondsRemaining=0;
+    }
   }
 
   @override
@@ -44,11 +78,14 @@ class _AuctionScreenState extends State<AuctionScreen> {
     super.dispose();
   }
 
+
+
+
   void startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
-        if (_secondsRemaining > 0) {
-          _secondsRemaining--;
+        if (_secondsRemaining! > 0) {
+          _secondsRemaining=_secondsRemaining!-1;
         } else {
           timer.cancel();
           Navigator.pop(context);
@@ -58,6 +95,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
     });
   }
 
+
   bidamount() async {
     print("entered bid");
     if (_amountController.text.toString() == "null" ||
@@ -65,7 +103,18 @@ class _AuctionScreenState extends State<AuctionScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Amount field cant be empty...')),
       );
-    } else {
+    }
+    else if( double.parse(_amountController.text) > discountedAmount){
+          ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please keep amount in range...')),
+      );
+    }
+     else if( double.parse(_amountController.text) < minbidamount){
+          ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please keep amount in range...')),
+      );
+    }
+     else {
       var request =
           http.MultipartRequest('POST', Uri.parse(ip + 'api/submitbid/'));
 
@@ -97,7 +146,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
   void startBidAmountUpdater() async {
     _timer = Timer.periodic(Duration(seconds: 3), (timer) async {
       var request =
-          http.MultipartRequest('POST', Uri.parse(ip + 'api/auctionupdate/'));
+          http.MultipartRequest('POST', Uri.parse(ip + 'api/auctionupdate/${widget.auctionid}/'));
 
       final Map<String, String> headers = {
         'Content-Type': 'multipart/form-data',
@@ -125,11 +174,19 @@ class _AuctionScreenState extends State<AuctionScreen> {
       setState(() {
         updatedBids = bids;
         bidAmountData.value = bids;
+        _thirdCall = data['third_call'];
+      _secondCall = data['second_call'];
+      _firstCall = data['first_call'];
+      
       });
-      // print(bidAmountData.value);
-      // setState(() {
-      //  myList=data['bidamount'];
-      //  print(myList);
+      if(_thirdCall == true){
+        setState(() {
+           auction_over=true;
+        // _secondsRemaining=10;
+        });
+       
+      }
+     
     });
   }
 
@@ -213,8 +270,10 @@ class _AuctionScreenState extends State<AuctionScreen> {
                                 color: Colors.black54,
                               ),
                             ),
-                            Text(
-                              '\$${widget.auction_amount}',
+                           
+                            //  int discountedAmount = (auctionAmount * 0.95).toInt();
+                            Text('$discountedAmount',
+                              //  '\$${(widget.auction_amount * 0.95).toInt()}',
                               style: TextStyle(
                                 fontSize: 24.0,
                                 fontWeight: FontWeight.bold,
@@ -259,7 +318,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
                               ),
                             ),
                             Text(
-                              '2:00 PM',
+                              widget.auction_time,
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,
@@ -280,7 +339,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
                           children: [
                             Icon(Icons.person_rounded, color: Colors.blue),
                             Text(
-                              'Customer ID',
+                              'Registration ID',
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,
@@ -307,7 +366,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
                 padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
                 child: Card(
                   elevation: 4,
-                  color: _secondsRemaining <= 60
+                  color: _secondsRemaining! <= 60
                       ? Colors.red[100]
                       : Colors.blue[100],
                   shape: RoundedRectangleBorder(
@@ -319,21 +378,34 @@ class _AuctionScreenState extends State<AuctionScreen> {
                       children: [
                         Icon(
                           Icons.warning,
-                          color: _secondsRemaining <= 60
+                          color: _secondsRemaining! <= 60
                               ? Colors.red[900]
                               : Colors.blue[900],
                         ),
                         SizedBox(width: 8),
+
+                        auction_over != true ?
                         Text(
-                          'Time remaining: ${formatDuration(_secondsRemaining)}',
+                          'Time remaining: ${formatDuration(_secondsRemaining!)}',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: _secondsRemaining <= 60
+                            color: _secondsRemaining! <= 60
                                 ? Colors.red[900]
                                 : Colors.blue[900],
                           ),
-                        ),
+                        )
+                        :  Text(
+                          'Auction Ends',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: _secondsRemaining! <= 60
+                                ? Colors.red[900]
+                                : Colors.blue[900],
+                          ),
+                        )
+                        ,
                       ],
                     ),
                   ),
@@ -341,6 +413,87 @@ class _AuctionScreenState extends State<AuctionScreen> {
               ),
 
               SizedBox(height: 5),
+             SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  child: Row(
+    children: [
+      if (_thirdCall)
+        Container(
+          width: 120.0,
+          child: Card(
+            color: Colors.blue,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Icon(Icons.call),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'Third Call',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      if (_secondCall)
+        Container(
+          width: 120.0,
+          child: Card(
+            color: Colors.green,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Icon(Icons.call),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'Second Call',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      if (_firstCall)
+        Container(
+          width: 120.0,
+          child: Card(
+            color: Colors.orange,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Icon(Icons.call),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'First Call',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+    ],
+  ),
+),
+
+
               // Text('Maximum bid amount: $_maxBidAmount'),
               Card(
                 elevation: 20.0,
@@ -370,17 +523,18 @@ class _AuctionScreenState extends State<AuctionScreen> {
                       SizedBox(width: 8.0),
                       Container(
                         width: 80.0,
-                        child: ElevatedButton(
+                        child: _thirdCall != true ? ElevatedButton(
                           onPressed: () {
                             bidamount();
                           },
                           child: Text('Bid'),
-                        ),
+                        ): SizedBox(),
                       ),
                     ],
                   ),
                 ),
               ),
+             
 
 // Expanded(
 //   child:   RepaintBoundary(
@@ -447,7 +601,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
 //               )
               SizedBox(height: 16),
                Text(
-            'Current highest bids:',
+            'Current lowest bids:',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -485,6 +639,8 @@ class _AuctionScreenState extends State<AuctionScreen> {
     ),
   ),
 ),
+ 
+
 
 
             ],

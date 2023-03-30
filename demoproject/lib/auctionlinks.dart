@@ -310,7 +310,7 @@ String formattedDate = today!.toLocal().toString().split(' ')[0];
                   // gotoauctionroom();
                    Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AuctionScreen(widget.custchitid,widget.auction_name,widget.auction_amount,item['id'])),
+              MaterialPageRoute(builder: (context) => AuctionScreen(widget.custchitid,widget.auction_name,widget.auction_amount,item['id'],formattedTime)),
             );
                 },
                 child: Text(
