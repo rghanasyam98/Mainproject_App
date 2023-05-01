@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:demoproject/Login_Screen.dart';
 import 'package:demoproject/auctionlinks.dart';
 import 'package:demoproject/bottomnav.dart';
 import 'package:demoproject/drawer.dart';
 import 'package:demoproject/ip.dart';
+import 'package:demoproject/userdash.dart';
 import 'package:demoproject/viewloans.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -26,7 +30,25 @@ class _AuctionState extends State<Auctiontab> {
     List<dynamic>? myList2;
     final _formKey = GlobalKey<FormState>();
     String? loanid;
+
+    FilePickerResult? result;
+  File? uploadDocument;
+  String documentPath = '';
 // Declare a TabController variable
+
+Future<void> pickFile() async {
+    result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      setState(() {
+        uploadDocument = File(result!.files.single.path!);
+        // Do something with the file...
+      });
+    } else {
+      print("No file selected");
+    }
+  }
+
 
   @override
   void initState() {
@@ -35,6 +57,7 @@ class _AuctionState extends State<Auctiontab> {
     myList2=[];
     super.initState();
     getjoinedchitinfo();
+    getchitresultinfo();
     // getauctioninfo();
     // getappliedloaninfo();
     // _tabController = TabController(length: 2, vsync: this);
@@ -239,6 +262,136 @@ if(accNum != null){
       }
 
 }
+
+
+ getchitresultinfo() async{
+       final accNum= await storage.read(key: 'accno');
+ for(int i=0;i<100;i=i+1)
+ {
+
+ }
+
+if(accNum != null){
+  // print(accountno);
+  
+      final token = await storage.read(key: 'token');
+
+  print("#######");
+  //  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.43.210:8000/api/getappliedloan/'));
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/getchitresultinfo/'));
+
+   final Map<String, String> headers = {
+    'Content-Type': 'multipart/form-data',
+    'Authorization': '$token',
+    };
+    request.headers.addAll(headers);
+     request.fields['accno'] =accNum;
+    
+   
+    
+      var response = await request.send();
+     
+    if (response.statusCode == 200) {
+       final body = await response.stream.bytesToString();
+       final data = json.decode(body);
+       print("******");
+       print(data);
+      //  Navigator.push(context, MaterialPageRoute(builder: (context) => Loantab()));
+      setState(() {
+         print("+++++");
+         myList2 = data;
+         print(myList2);
+      // // });
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Request for loan successfully send')),
+    });
+
+    }
+    else if(response.statusCode == 204) {
+      //      ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Your request is already in pending...')),
+      // );
+    }
+    else{
+       myList=[];
+    }
+   
+
+}
+
+      else{
+
+    //      ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text('Please link your account with app before applying for loan....')),
+    // );
+    //      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
+    // Loantab()), (Route<dynamic> route) => false);
+      }
+
+}
+
+
+Future<void> uploadSecurityDocumentToServer(id) async {
+    // if (uploadDocument == null || uploadDocument2 == null) {
+    //   // No file selected
+    //   return;
+    // }
+          final token = await storage.read(key: 'token');
+           final accno = await storage.read(key: 'accno');
+
+    var request = http.MultipartRequest('POST', Uri.parse(ip+'api/uploadSecurityDocumentToServer/'));
+   final Map<String, String> headers = {
+    'Content-Type': 'multipart/form-data',
+    'Authorization': '$token',
+    'accno': '$accno'
+    };
+    request.headers.addAll(headers);
+    // request.files.add(await http.MultipartFile.fromPath(
+    //     'document', uploadDocument!.path));
+
+   List<int> docBytes = await uploadDocument!.readAsBytes();
+  
+  // Extract the file name from the path
+     String fileName = uploadDocument!.path.split('/').last;
+  
+  // Create the multipart file
+
+    
+
+    var docFile= http.MultipartFile.fromBytes(
+    'doc', // field name
+    docBytes, // file content
+    filename: fileName,
+  );
+   request.fields['rid'] =id.toString();
+  
+  request.files.add(docFile);
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+       ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Documents uploaded successfully....')),
+    );
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
+    UserHome()), (Route<dynamic> route) => false);
+      // File uploaded successfully
+      
+    } 
+    else if(response.statusCode == 204) {
+       ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('You where already uploaded....')),
+    );
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) =>
+    UserHome()), (Route<dynamic> route) => false);
+      
+    }
+    else{
+        ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Something went wrong please try again later....')),
+    );
+    }
+  }
 
  
 
@@ -572,14 +725,40 @@ onTap: () {
 //   highlightColor: Colors.yellow,
 //   splashColor: Colors.green,
 // ): SizedBox(), 
-             
+ trailing: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      if (uploadDocument == null)
+      IconButton(
+        onPressed: () {
+          pickFile();
+          // Handle button press for uploading document
+        },
+        icon: Icon(Icons.file_upload),
+        tooltip: 'Select Document',
+        color: Colors.blue,
+      ),
+      if (uploadDocument != null) SizedBox(width: 8),
+      if (uploadDocument != null)
+        IconButton(
+          onPressed: () {
+            uploadSecurityDocumentToServer(item['id']);
+            // Handle button press for uploading to server
+          },
+          icon: Icon(Icons.cloud_upload),
+          tooltip: 'Upload to Server',
+          color: Colors.green,
+        ),
+    ],
+  ),
+           leading: Icon(Icons.check_circle, color: Colors.green),
             
-              title: Text( item['loan_name'].toString(),style: TextStyle(fontWeight: FontWeight.bold),),
+              title: Text( item['chit_name']!.toString(),style: TextStyle(fontWeight: FontWeight.bold),),
               subtitle: Column(
                 children: [
                   Row(
                     children: [ Text(
-              "Loan amount: ",
+              "Won amount: ",
               style: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
             ),
                       Text( item['amount'].toString(),style: TextStyle(
@@ -593,10 +772,10 @@ onTap: () {
                     Row(
                       children: [
                       Text(
-              "Minimum date: ",
+              "Auction date: ",
               style: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
             ),
-                        Text( item['min'].toString(),style: TextStyle(
+                        Text( item['date'].toString(),style: TextStyle(
                           fontSize: 14,
                           color: Colors.deepPurpleAccent,
                           fontStyle: FontStyle.italic
@@ -606,42 +785,42 @@ onTap: () {
                     Row(
                       children: [
                         Text(
-              "Maximam date: ",
+              "Chit registration ID: ",
               style: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
             ),
-                        Text( item['max'].toString(),style: TextStyle(
+                        Text( item['custchitid'].toString(),style: TextStyle(
                           fontSize: 14,
                           color:  Colors.deepPurpleAccent,
                           fontStyle: FontStyle.italic
                         ),),
                       ],
                     ),
-                     Row(
-                      children: [
-                        Text(
-              "EMI: ",
-              style: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
-            ),
-                        Text( item['emi'].toString(),style: TextStyle(
-                          fontSize: 14,
-                          color:  Colors.deepPurpleAccent,
-                          fontStyle: FontStyle.italic
-                        ),),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-              "status: ",
-              style: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
-            ),
-                        Text( item['status'].toString(),style: TextStyle(
-                          fontSize: 14,
-                          color:  Colors.deepPurpleAccent,
-                          fontStyle: FontStyle.italic
-                        ),),
-                      ],
-                    ),
+            //          Row(
+            //           children: [
+            //             Text(
+            //   "EMI: ",
+            //   style: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
+            // ),
+            //             Text( item['emi'].toString(),style: TextStyle(
+            //               fontSize: 14,
+            //               color:  Colors.deepPurpleAccent,
+            //               fontStyle: FontStyle.italic
+            //             ),),
+            //           ],
+            //         ),
+            //         Row(
+            //           children: [
+            //             Text(
+            //   "status: ",
+            //   style: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
+            // ),
+            //             Text( item['status'].toString(),style: TextStyle(
+            //               fontSize: 14,
+            //               color:  Colors.deepPurpleAccent,
+            //               fontStyle: FontStyle.italic
+            //             ),),
+            //           ],
+            //         ),
                 ],
               ),
             ),

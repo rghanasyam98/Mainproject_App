@@ -256,7 +256,7 @@ String formattedDate = today!.toLocal().toString().split(' ')[0];
                       Text(
                         "Date: ",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           color: Colors.blueGrey,
@@ -265,7 +265,7 @@ String formattedDate = today!.toLocal().toString().split(' ')[0];
                       Text(
                         item['auction_date'],
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           color: Colors.deepPurpleAccent,
@@ -281,7 +281,7 @@ String formattedDate = today!.toLocal().toString().split(' ')[0];
                       Text(
                         "Time: ",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           color: Colors.blueGrey,
@@ -291,7 +291,7 @@ String formattedDate = today!.toLocal().toString().split(' ')[0];
                         // item['auction_time'],
                         formattedTime,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           color: Colors.deepPurpleAccent,

@@ -165,6 +165,7 @@ print(widget.auction_name);
       final bidsData = data['bidamount'] as List<dynamic>;
       final bids = bidsData
           .map((bidData) => Bid(
+            
                 auction_id_id: bidData['auction_id_id'],
                 cust_chitid_id: bidData['cust_chitid_id'],
                 amount: double.parse(bidData['amount'].toString()),

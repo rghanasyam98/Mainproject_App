@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:demoproject/loan.dart';
 import 'package:demoproject/userdash.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -34,6 +36,8 @@ class _ChitState extends State<Chit> {
     String? chitid;
     final ValueNotifier<String> _selectedItem = ValueNotifier<String>('');
     Razorpay? _razorpay;
+    double?  amounttopay;
+    int? custchitid;
 // Declare a TabController variable
 
 // String _selectedItem = '';
@@ -370,14 +374,45 @@ sendchitrequest() async{
   }
  // 'key': 'rzp_test_NNbwJ9tmM0fbxj', rzp_test_4o2G44Ax4AOqRE
 
- void openCheckout() async {
+ void openCheckout(custchitId) async {
+     custchitid=custchitId;
+     var request = http.MultipartRequest('POST', Uri.parse(ip+'api/getinstallmentamount/$custchitId/'));
+
+   final Map<String, String> headers = {
+    'Content-Type': 'multipart/form-data',
+    
+    };
+    request.headers.addAll(headers);
+    //  request.fields['chitid'] =chitid.toString();
+      var response = await request.send();
+    if (response.statusCode == 200) {
+       final body = await response.stream.bytesToString();
+       final data = json.decode(body);
+              print("!!!!!");
+
+      //  print(data);
+      
+    amounttopay=double.parse(data['amount']);
+      print(amounttopay);
+         
+        
+    }
+    
+    else{
+       ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Something went wrong please try again later....')),
+    );
+    return;
+    }
+
+
   final mail = await storage.read(key: 'mail');
   final phone = await storage.read(key: 'phone'); 
     final accholdername = await storage.read(key: 'accholdername');
 
   var options = {
     'key': 'rzp_test_4uGg9FUbpCj4fB', 
-    'amount': 28200,
+    'amount':amounttopay!*100,
     'name': accholdername,
     'description': 'Payment',
     'method': 'netbanking,card,upi,wallet,emi',
@@ -417,11 +452,49 @@ sendchitrequest() async{
   //   } catch (e) {
   //     debugPrint(e.toString());
   //   }
+
+
   // }
 
+gotopayment(pid) async{
+      var request = http.MultipartRequest('POST', Uri.parse(ip+'api/gotopayment_table/$custchitid/'));
+
+   final Map<String, String> headers = {
+    'Content-Type': 'multipart/form-data',
+    
+    
+    };
+    request.headers.addAll(headers);
+     request.fields['transaction'] =pid.toString();
+     request.fields['amount'] =amounttopay.toString();
+      var response = await request.send();
+    if (response.statusCode == 200) {
+      //  final body = await response.stream.bytesToString();
+      //  final data = json.decode(body);
+      //         print("!!!!!");
+
+      //  print(data);
+      
+     ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Payment success....')),
+    );
+         
+        
+    }
+    
+    else{
+       ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Something went wrong please try again later....')),
+    );
+    return;
+    }
+}
+
+
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    Fluttertoast.showToast(
-        msg: "SUCCESS: " + response.paymentId.toString(),);
+    gotopayment(response.paymentId.toString());
+    // Fluttertoast.showToast(
+    //     msg: "SUCCESS: " + response.paymentId.toString(),);
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -887,7 +960,7 @@ if(accNum != null){
       IconButton(
   icon: Icon(Icons.paypal_sharp),
   onPressed: () {
-    openCheckout();
+    openCheckout(item['id']);
     // // handle button press
     // loanid=item['id'].toString();
     // _showPopup(context);
